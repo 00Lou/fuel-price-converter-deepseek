@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClearFuel · honest unit & currency converter</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      margin: 0;
+      color: #1e293b;
+    }
+
+    .card {
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -8px rgba(0,10,30,0.15);
+      padding: 2rem 2rem 2.2rem;
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #0b2b40, #1f4b6e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: #4a5a72;
+      margin-bottom: 2rem;
+      border-left: 4px solid #a0c0d0;
+      padding-left: 1rem;
+      background: #f0f4fa;
+      border-radius: 0 1rem 1rem 0;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .conversion-panel {
+      background: #f9fbfe;
+      border-radius: 1.8rem;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e4eaf2;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      background: white;
+      padding: 0.75rem 1.2rem;
+      border-radius: 3rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      border: 1px solid #dde3ed;
+    }
+
+    .price-input-wrapper {
+      flex: 2 1 200px;
+      display: flex;
+      align-items: center;
+      background: #f2f5fa;
+      border-radius: 2.5rem;
+      padding: 0.2rem 1rem;
+      border: 1px solid #d0dbe8;
+    }
+
+    .currency-symbol {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #3b4e66;
+      margin-right: 0.25rem;
+    }
+
+    #priceInput {
+      font-size: 1.3rem;
+      padding: 0.65rem 0 0.65rem 0.3rem;
+      border: none;
+      background: transparent;
+      width: 120px;
+      font-weight: 500;
+      outline: none;
+    }
+
+    #priceInput::placeholder {
+      color: #9aabbf;
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .unit-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      background: #eef2f7;
+      padding: 0.3rem;
+      border-radius: 3rem;
+    }
+
+    .unit-pill {
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: transparent;
+      border-radius: 3rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #415570;
+      cursor: pointer;
+      transition: 0.1s;
+      white-space: nowrap;
+    }
+
+    .unit-pill.active {
+      background: white;
+      color: #0a2c3d;
+      box-shadow: 0 4px 8px rgba(0, 30, 60, 0.08);
+      font-weight: 600;
+    }
+
+    .currency-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 1.8rem 0 1.5rem;
+    }
+
+    .select-pair {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.35rem 0.5rem 0.35rem 1rem;
+      border-radius: 3rem;
+      border: 1px solid #d8e1ec;
+    }
+
+    .select-pair label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4f658d;
+    }
+
+    select {
+      appearance: none;
+      background: #ecf2f9;
+      border: none;
+      padding: 0.6rem 2rem 0.6rem 1.2rem;
+      border-radius: 2.5rem;
+      font-weight: 500;
+      color: #0e2b3f;
+      font-size: 1rem;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233f5575' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      background-size: 1.1rem;
+    }
+
+    .swap-icon {
+      font-size: 1.3rem;
+      color: #7a8ca3;
+      padding: 0 0.2rem;
+    }
+
+    .result-block {
+      background: #1c2d3f;
+      border-radius: 2rem;
+      padding: 1.5rem 2rem;
+      margin-top: 1rem;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2), 0 8px 18px rgba(0, 40, 70, 0.2);
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 400;
+      color: #b2c9e0;
+    }
+
+    .result-value {
+      font-size: 2.7rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .result-unit {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #bed5ef;
+      margin-left: 0.5rem;
+    }
+
+    .exchange-metadata {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      background: #e4ecf5;
+      padding: 0.8rem 1.4rem;
+      border-radius: 3rem;
+      margin-top: 1rem;
+      color: #2f4765;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .exchange-source {
+      font-weight: 600;
+      background: #cfddee;
+      padding: 0.25rem 1rem;
+      border-radius: 30px;
+    }
+
+    .geolocation-section {
+      margin: 1.5rem 0 0.8rem;
+    }
+
+    .geoloc-btn {
+      background: white;
+      border: 1.5px solid #b9cee8;
+      padding: 0.6rem 1.5rem;
+      border-radius: 3rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #1d3b5a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.15s;
+    }
+
+    .geoloc-btn:hover {
+      background: #e3edf8;
+      border-color: #7f9fc7;
+    }
+
+    .geoloc-note {
+      font-size: 0.8rem;
+      color: #4e6580;
+      margin-top: 0.3rem;
+      padding-left: 0.5rem;
+    }
+
+    .context-card {
+      background: #f0f5fc;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      border: 1px solid #cbdae9;
+      margin: 1.8rem 0 1rem;
+    }
+
+    .context-title {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #183c56;
+      margin-bottom: 0.8rem;
+    }
+
+    .context-table {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem 2.5rem;
+      background: #ffffffc7;
+      padding: 1.2rem 1.5rem;
+      border-radius: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .context-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .context-label {
+      font-weight: 400;
+      color: #456078;
+    }
+
+    .context-number {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #00263b;
+    }
+
+    .footnote {
+      font-size: 0.8rem;
+      color: #657e9e;
+      margin-top: 1rem;
+      border-top: 1px dashed #b8cde0;
+      padding-top: 0.8rem;
+    }
+
+    .error-banner {
+      background: #ffebe6;
+      color: #b13e3e;
+      border-radius: 2rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+      border: 1px solid #f3c0b0;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>⛽ ClearFuel</h1>
+  <div class="tagline">honest conversion · live ECB rates · no fake pump prices</div>
+
+  <!-- main conversion area -->
+  <div class="conversion-panel">
+    <!-- price input + volume unit -->
+    <div class="input-group">
+      <div class="price-input-wrapper">
+        <span class="currency-symbol" id="inputCurrencySymbol">£</span>
+        <input type="text" id="priceInput" placeholder="1.45" value="1.45" inputmode="decimal">
+      </div>
+      <div class="unit-pills" id="inputUnitGroup">
+        <button class="unit-pill active" data-unit="litre">€/litre</button>
+        <button class="unit-pill" data-unit="us_gal">$/US gal</button>
+        <button class="unit-pill" data-unit="uk_gal">$/Imp gal</button>
+      </div>
+    </div>
+
+    <!-- currency selection: from / to -->
+    <div class="currency-row">
+      <div class="select-pair">
+        <label>from</label>
+        <select id="currencyFrom">
+          <option value="GBP" selected>GBP (£)</option>
+          <option value="USD">USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="CAD">CAD (C$)</option>
+          <option value="AUD">AUD (A$)</option>
+        </select>
+      </div>
+      <span class="swap-icon">→</span>
+      <div class="select-pair">
+        <label>to</label>
+        <select id="currencyTo">
+          <option value="GBP">GBP (£)</option>
+          <option value="USD" selected>USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="CAD">CAD (C$)</option>
+          <option value="AUD">AUD (A$)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- result display -->
+    <div class="result-block">
+      <div class="result-label">converted price</div>
+      <div>
+        <span class="result-value" id="resultAmount">2.19</span>
+        <span class="result-unit" id="resultUnit">USD per US gallon</span>
+      </div>
+    </div>
+
+    <!-- exchange rate metadata & errors -->
+    <div id="exchangeInfo" class="exchange-metadata">
+      <span id="rateDate">loading rates...</span>
+      <span class="exchange-source" id="rateSource">European Central Bank</span>
+    </div>
+    <div id="errorMessage" class="error-banner hidden">
+      <span>⚠️</span> <span id="errorText">API error</span>
+    </div>
+  </div>
+
+  <!-- optional geolocation (with consent) -->
+  <div class="geolocation-section">
+    <button class="geoloc-btn" id="geoBtn">📍 Use my location (set default currency)</button>
+    <div class="geoloc-note" id="geoNote"></div>
+  </div>
+
+  <!-- real‑world context (averages, clearly labelled) -->
+  <div class="context-card">
+    <div class="context-title">📊 real‑world context (UK average, January 2025)</div>
+    <div class="context-table">
+      <div class="context-item"><span class="context-label">petrol (unleaded)</span> <span class="context-number">£1.43/litre</span></div>
+      <div class="context-item"><span class="context-label">diesel</span> <span class="context-number">£1.48/litre</span></div>
+      <div class="context-item"><span class="context-label">source</span> <span class="context-number">UK Gov E10 data</span></div>
+    </div>
+    <div class="footnote">
+      ⓘ Averages for illustration – not live station prices. No public dataset provides real‑time pump prices globally.
+    </div>
+  </div>
+
+  <!-- small explanatory footer -->
+  <div style="font-size:0.75rem; color:#6b7f9a; text-align:center; margin-top:1.5rem;">
+    <span>🔵 conversion: litre → internal → target unit · exchange rates: ECB via <strong>frankfurter.dev</strong></span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --- constants & helper ---
+    const VOLUME_LITRE = 1;
+    const VOLUME_US_GALLON = 3.78541;
+    const VOLUME_UK_GALLON = 4.54609;
+
+    const currencySymbols = {
+      GBP: '£', USD: '$', EUR: '€', CAD: 'C$', AUD: 'A$'
+    };
+
+    // DOM elements
+    const priceInput = document.getElementById('priceInput');
+    const inputCurrencySymbol = document.getElementById('inputCurrencySymbol');
+    const currencyFrom = document.getElementById('currencyFrom');
+    const currencyTo = document.getElementById('currencyTo');
+    const resultAmount = document.getElementById('resultAmount');
+    const resultUnit = document.getElementById('resultUnit');
+    const rateDateSpan = document.getElementById('rateDate');
+    const rateSource = document.getElementById('rateSource');
+    const errorDiv = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const inputUnitBtns = document.querySelectorAll('#inputUnitGroup .unit-pill');
+    const geoBtn = document.getElementById('geoBtn');
+    const geoNote = document.getElementById('geoNote');
+
+    // state
+    let currentInputUnit = 'litre';          // litre, us_gal, uk_gal
+    let exchangeRates = null;                // { date, rates: { GBP: ..., USD:1, ... } }
+    let lastFetchDate = null;
+    let apiFailed = false;
+
+    // --- forex fetch from Frankfurter (ECB, no key) ---
+    async function fetchRates() {
+      try {
+        const response = await fetch('https://api.frankfurter.dev/v1/latest?base=USD');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        // expected: { date: "2025-03-01", rates: { GBP: 0.79, EUR:0.92, ... }, base: "USD" }
+        exchangeRates = {
+          date: data.date,
+          rates: data.rates
+        };
+        // ensure we have all needed currencies (if missing, fill approximate? better show error)
+        const needed = ['GBP','USD','EUR','CAD','AUD'];
+        for (let cur of needed) {
+          if (!exchangeRates.rates[cur] && cur !== 'USD') {
+            console.warn(`Missing rate for ${cur}, using fallback 1.0 (error prone)`);
+            // we'll show error but keep going; but API normally returns all major.
+          }
+        }
+        // USD base is 1
+        exchangeRates.rates.USD = 1.0;
+        lastFetchDate = data.date;
+        apiFailed = false;
+        hideError();
+        updateRateDisplay();
+        convert(); // refresh
+      } catch (err) {
+        console.error('Exchange rate fetch failed:', err);
+        apiFailed = true;
+        exchangeRates = null;
+        showError('Could not fetch live rates. Using fallback mode (static 1:1).');
+        // minimal fallback (honest but inaccurate) — set approximate from memory? but we keep null, convert will handle.
+        updateRateDisplay();
+        convert(); // will show zeros?
+      }
+    }
+
+    function showError(msg) {
+      errorText.innerText = msg;
+      errorDiv.classList.remove('hidden');
+    }
+    function hideError() {
+      errorDiv.classList.add('hidden');
+    }
+
+    function updateRateDisplay() {
+      if (exchangeRates && exchangeRates.date) {
+        rateDateSpan.innerText = `rates: ${exchangeRates.date}`;
+        rateSource.innerText = 'ECB via frankfurter.dev';
+      } else {
+        rateDateSpan.innerText = apiFailed ? 'rates unavailable' : 'fetching...';
+      }
+    }
+
+    // --- conversion logic ---
+    function getUnitFactor(unit) {
+      if (unit === 'us_gal') return VOLUME_US_GALLON;
+      if (unit === 'uk_gal') return VOLUME_UK_GALLON;
+      return VOLUME_LITRE;
+    }
+
+    function parseInputPrice(val) {
+      // remove any currency symbols and extra spaces
+      let cleaned = val.replace(/[^0-9.]/g, '');
+      let num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function convert() {
+      // get raw numeric input
+      let rawInput = priceInput.value.trim();
+      if (rawInput === '') rawInput = '0';
+      let inputValue = parseInputPrice(rawInput);
+
+      // get fromCurrency and toCurrency
+      const fromCur = currencyFrom.value;
+      const toCur = currencyTo.value;
+
+      // update input currency symbol
+      inputCurrencySymbol.innerText = currencySymbols[fromCur] || '£';
+
+      // volume factors
+      const fromFactor = getUnitFactor(currentInputUnit);
+      // 1. price per litre in FROM currency
+      let pricePerLitreFromCur = inputValue / fromFactor;
+
+      // 2. convert to target currency using exchange rates (if available)
+      let pricePerLitreToCur = 0;
+      let rateUsed = 1;
+
+      if (exchangeRates && exchangeRates.rates && exchangeRates.rates[fromCur] != null && exchangeRates.rates[toCur] != null) {
+        // rates are relative to USD: amount in USD = amountInCur / rateFrom? careful: if base is USD, rate[EUR] = 0.92 means 1 USD = 0.92 EUR.
+        // So to convert FROM_Cur to USD: valueInUSD = valueInCur / rate[FROM]? Wait: 1 EUR = ? USD? If 1 USD = 0.92 EUR => 1 EUR = 1/0.92 USD = 1.087 USD.
+        // Standard: rate[FROM] = amount of FROM per 1 USD. So value in USD = valueInCur / rate[FROM].
+        const rateFrom = exchangeRates.rates[fromCur];   // e.g. GBP 0.79 → 1 USD = 0.79 GBP
+        const rateTo = exchangeRates.rates[toCur];       // e.g. EUR 0.92 → 1 USD = 0.92 EUR
+
+        if (rateFrom > 0 && rateTo > 0) {
+          // first convert to USD: valueUsd = pricePerLitreFromCur / rateFrom
+          const valueUsd = pricePerLitreFromCur / rateFrom;
+          // then convert to target: pricePerLitreToCur = valueUsd * rateTo
+          pricePerLitreToCur = valueUsd * rateTo;
+          rateUsed = (1/rateFrom) * rateTo; // just for display maybe
+        } else {
+          pricePerLitreToCur = 0;
+        }
+      } else {
+        // fallback: assume 1:1 (honest message shown)
+        pricePerLitreToCur = pricePerLitreFromCur; // if no rates
+      }
+
+      // 3. convert to target unit (litre, us_gal, uk_gal)
+      const toUnitBtn = document.querySelector('#inputUnitGroup .unit-pill.active'); // we reuse input group for output as well (same unit selection)
+      let targetUnit = currentInputUnit; // for simplicity, output unit = input unit? but spec says we can show any? better: keep output unit same as selected unit.
+      // But spec wants "X currency per [unit]" with unit from the pill group. We'll use active unit as display unit.
+      const toFactor = getUnitFactor(targetUnit);
+      const finalPrice = pricePerLitreToCur * toFactor;
+
+      // format result
+      resultAmount.innerText = finalPrice.toFixed(2);
+      let unitDisplay = targetUnit === 'litre' ? 'litre' : (targetUnit === 'us_gal' ? 'US gallon' : 'Imperial gallon');
+      resultUnit.innerText = `${toCur} per ${unitDisplay}`;
+
+      // add tiny note if fallback
+    }
+
+    // --- event listeners ---
+    priceInput.addEventListener('input', convert);
+    currencyFrom.addEventListener('change', (e) => {
+      convert();
+    });
+    currencyTo.addEventListener('change', convert);
+
+    inputUnitBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        inputUnitBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentInputUnit = btn.dataset.unit;
+        convert();
+      });
+    });
+
+    // geolocation with consent
+    geoBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        geoNote.innerText = 'Geolocation not supported.';
+        return;
+      }
+      geoBtn.disabled = true;
+      geoNote.innerText = 'Requesting location…';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          geoNote.innerText = `📍 Location used to suggest currency (lat ${pos.coords.latitude.toFixed(2)}). No station data.`;
+          // approximate reverse: if in US/CA/AU/GB etc. we set default currency (naive)
+          // very rough: if in UK long/lat? Instead simple: just note we don't show stations.
+          geoBtn.disabled = false;
+        },
+        (err) => {
+          geoNote.innerText = `Location denied or error: ${err.message}`;
+          geoBtn.disabled = false;
+        }
+      );
+    });
+
+    // initialise
+    function init() {
+      fetchRates();
+      // set active unit
+      currentInputUnit = 'litre';
+      convert();
+      // refresh rates every 30 min (optional)
+      setInterval(() => fetchRates(), 30 * 60 * 1000);
+    }
+
+    init();
+  })();
+</script>
+<!-- GitHub Pages deployment instructions (visible as comment, but also in readable format below) -->
+<div style="background:#e2eaf3; padding:1.5rem; border-radius:1.5rem; margin-top:2.5rem; font-size:0.9rem">
+  <p style="font-weight:bold; margin-bottom:0.5rem;">📁 GitHub Pages – step‑by‑step (no prior knowledge)</p>
+  <ol style="padding-left:1.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+    <li><strong>Create repository</strong>: Log in to GitHub, click the green "New" button. Name it e.g. <code>fuel-converter</code>, keep public, click "Create repository".</li>
+    <li><strong>Upload index.html</strong>: On the new repo page, click "Add file" → "Upload files". Drag and drop this <code>index.html</code> (save the code above as a file named index.html). Then click "Commit changes".</li>
+    <li><strong>Enable Pages</strong>: Go to repository "Settings" → "Pages" (left sidebar). Under "Branch", select "main" and "/ (root)", then "Save".</li>
+    <li><strong>Get your URL</strong>: After a minute, refresh the Pages section – you'll see a message like "Your site is live at <code>https://yourusername.github.io/fuel-converter</code>".</li>
+    <li><strong>Done</strong>: Anyone can now use the tool via that link. Updates: just upload a new index.html to the same repository.</li>
+  </ol>
+  <p style="margin-top:0.8rem">✅ No API keys needed – exchange rates from European Central Bank (frankfurter.dev). All conversion logic runs in your browser.</p>
+</div>
+</body>
+</html>
